@@ -5,6 +5,7 @@ let &runtimepath.="," . getcwd()
 local api = vim.api
 local buf, win
 
+-- oepn window api
 local function open_window()
   buf = vim.api.nvim_create_buf(false, true)
   local border_buf = vim.api.nvim_create_buf(false, true)
@@ -57,9 +58,10 @@ local function open_window()
   api.nvim_command('au BufWipeout <buffer> exe "silent bwipeout! "' .. border_buf)
 end
 
+-- update content in buf
 local position = 0
 local function update_view(direction)
-  position = position + direction
+  position = position + direction -- git position
   if position < 0 then
     position = 0
   end -- HEAD~0 is the newest stat
@@ -70,8 +72,41 @@ local function update_view(direction)
   end
 
   api.nvim_buf_set_lines(buf, 0, -1, false, result)
+
+  -- add hightlight
+  -- config hightlight in ../plugin/whid.vim
+  -- add hightlight
+  api.nvim_buf_add_highlight(buf, -1, "WhidHeader", 0, 0, -1)
+  api.nvim_buf_add_highlight(buf, -1, "WhidSubHeader", 1, 0, -1)
+  vim.bo.modifiable = false
 end
 
-return {
-  open_window = open_window,
-}
+-- user input
+local function set_mapping()
+  local mappings = {
+    ["["] = "update_view(-1)",
+    ["]"] = "update_view(1)",
+    ["<cr>"] = "open_file()",
+    h = "update_view(-1)",
+    l = "update_view(1)",
+    q = "close_window()",
+    k = "move_cursor()",
+  }
+  for k, v in pairs(mappings) do
+    api.nvim_buf_set_keymap(buf, "n", "k", 'lua require"whid"' .. v .. "<cr>", {
+      nowait = true,
+      noremap = true,
+      silent = true,
+    })
+  end
+  -- disable other key
+  -- stylua: ignore
+  local other_chars = {
+    "a", "b", "c", "d", "e", "f", "g", "i", "n", "o", "p", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+  }
+  for _, v in ipairs(other_chars) do
+    api.nvim_buf_set_keymap(buf, "n", v, "", { nowait = true, noremap = true, silent = true })
+    api.nvim_buf_set_keymap(buf, "n", v:upper(), "", { nowait = true, noremap = true, silent = true })
+    api.nvim_buf_set_keymap(buf, "n", "<c-" .. v .. ">", "", { nowait = true, noremap = true, silent = true })
+  end
+end

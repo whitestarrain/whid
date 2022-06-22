@@ -81,6 +81,29 @@ local function update_view(direction)
   vim.bo.modifiable = false
 end
 
+-- open file under cursor
+local function open_file()
+  local str = api.nvim_get_current_line()
+end
+
+local function close_window()
+  api.nvim_win_close(win, true)
+end
+
+-- Our file list start at line 4, so we can prevent reaching above it
+-- from bottm the end of the buffer will limit movment
+local function move_cursor()
+  local new_pos = math.max(4, api.nvim_win_get_cursor(win)[1] - 1)
+  api.nvim_win_set_cursor(win, { new_pos, 0 })
+end
+
+-- Open file under cursor
+local function open_file()
+  local str = api.nvim_get_current_line()
+  close_window()
+  api.nvim_command("edit " .. str)
+end
+
 -- user input
 local function set_mapping()
   local mappings = {

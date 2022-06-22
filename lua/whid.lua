@@ -57,7 +57,21 @@ local function open_window()
   api.nvim_command('au BufWipeout <buffer> exe "silent bwipeout! "' .. border_buf)
 end
 
-return {
+local position = 0
+local function update_view(direction)
+  position = position + direction
+  if position < 0 then
+    position = 0
+  end -- HEAD~0 is the newest stat
+  local result = vim.fn.systemlist("git diff-tree --no-commit-id --name-only -r HEAD~" .. position)
+  -- with small indentation results will look better
+  for k, _ in pairs(result) do
+    result[k] = "  " .. result[k]
+  end
 
+  api.nvim_buf_set_lines(buf, 0, -1, false, result)
+end
+
+return {
   open_window = open_window,
 }

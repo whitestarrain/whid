@@ -105,7 +105,7 @@ local function open_file()
 end
 
 -- user input
-local function set_mapping()
+local function set_mappings()
   local mappings = {
     ["["] = "update_view(-1)",
     ["]"] = "update_view(1)",
@@ -133,3 +133,19 @@ local function set_mapping()
     api.nvim_buf_set_keymap(buf, "n", "<c-" .. v .. ">", "", { nowait = true, noremap = true, silent = true })
   end
 end
+
+local function whid()
+  position = 0 -- if you want to preserve last displayed state just omit this line
+  open_window()
+  set_mappings()
+  update_view(0)
+  api.nvim_win_set_cursor(win, { 4, 0 }) -- set cursor on first list entry
+end
+
+return {
+  whid = whid,
+  --[[ update_view = update_view,
+  open_file = open_file,
+  move_cursor = move_cursor,
+  close_window = close_window, ]]
+}

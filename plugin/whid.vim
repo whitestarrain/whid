@@ -10,10 +10,12 @@ command! Whid lua require'whid'.whid()
 let &cpo = s:save_cpo " and restore after
 unlet s:save_cpo
 
-let g:loaded_whid = 1
 
+command! Whid lua require'whid'.whid()
 
 " We will link to existing default highlights group instead of setting color by ourselves
 " This way it will match user colorsheme.
 hi def link WhidHeader      Number
 hi def link WhidSubHeader   Identifier
+
+let g:loaded_whid = 1
